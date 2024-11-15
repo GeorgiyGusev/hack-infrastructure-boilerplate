@@ -1,0 +1,19 @@
+log:
+  level: DEBUG
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    defaultRule: "Host(`{{ normalize .Name }}.localhost`)"
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+  ssh:
+    address: ":2222"
+
+api:
+  insecure: true
+  dashboard: true

@@ -1,0 +1,50 @@
+name: "traefik-compose"
+services:
+  traefik:
+    image: traefik:latest
+    command:
+      - "--api.insecure=false"
+      - "--log.level=DEBUG"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--entryPoints.ssh.address=:2222"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entryPoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesResolvers.leresolver.acme.httpChallenge.entryPoint=web"
+      - "--certificatesResolvers.leresolver.acme.email=georgiy.guse@gmail.com"
+      - "--certificatesresolvers.leresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.goida.dev`)"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=leresolver"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=admin:$$2y$$05$$eMsnx4uY4.rnhnNvZfNxDOxh8vQvEsbt5APWLLAioRF.mFuLySyl."
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "letsencrypt:/letsencrypt"
+    environment:
+      - "TZ=Europe/Moscow"
+    restart: unless-stopped
+
+networks:
+  traefik:
+    name: "traefik-network"
+    driver: bridge
+
+volumes:
+  letsencrypt:
+
+secrets:
+  traefik_password:
+    external: true

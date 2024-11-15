@@ -1,0 +1,59 @@
+name: "gitlab"
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    secrets:
+      - smtp_password
+      - smtp_login
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.goida.dev'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2222
+        nginx['listen_https'] = false
+        nginx['listen_port'] = 80
+        gitlab_rails['smtp_enable'] = true
+        gitlab_rails['smtp_address'] = "smtp.gmail.com"
+        gitlab_rails['smtp_port'] = 587
+        gitlab_rails['smtp_user_name'] = File.read('/run/secrets/smtp_login').strip
+        gitlab_rails['smtp_password'] = File.read('/run/secrets/smtp_password').strip
+        gitlab_rails['smtp_domain'] = "smtp.gmail.com"
+        gitlab_rails['smtp_authentication'] = "login"
+        gitlab_rails['smtp_enable_starttls_auto'] = true
+        gitlab_rails['smtp_tls'] = false
+        gitlab_rails['smtp_openssl_verify_mode'] = 'peer' # Can be: 'none', 'peer', 'client_once', 'fail_if_no_peer_cert', see http://api.rubyonrails.org/classes/ActionMailer/Base.html
+
+    volumes:
+      - ./gitlab/config:/etc/gitlab
+      - ./gitlab/logs:/var/log/gitlab
+      - ./gitlab/data:/var/opt/gitlab
+    labels:
+      # WebUi Config
+      - "traefik.enable=true"
+      - "traefik.http.routers.gitlab.entrypoints=websecure"
+      - "traefik.http.routers.gitlab.rule=Host(`gitlab.goida.dev`)"
+      - "traefik.http.routers.gitlab.tls=true"
+      - "traefik.http.routers.gitlab.tls.certresolver=leresolver"
+      - "traefik.http.routers.gitlab.service=gitlab"
+      - "traefik.http.services.gitlab.loadbalancer.server.port=80"
+      # SSH config
+      - "traefik.tcp.routers.gitlab-ssh.rule=HostSNI(`gitlab.goida.dev`)"
+      - "traefik.tcp.routers.gitlab-ssh.entrypoints=ssh"
+      - "traefik.tcp.routers.gitlab-ssh.service=gitlab-ssh-svc"
+      - "traefik.tcp.services.gitlab-ssh-svc.loadbalancer.server.port=2222"
+      - "traefik.tcp.routers.gitlab-ssh.tls=true"
+      - "traefik.tcp.routers.gitlab-ssh.tls.certresolver=leresolver"
+    networks:
+      - traefik
+    restart: unless-stopped
+
+networks:
+  traefik:
+    name: "traefik-network"
+    external: true
+
+secrets:
+  smtp_password:
+    file: "secrets/smtp_password.txt"
+  smtp_login:
+    file: "secrets/smtp_login.txt"
