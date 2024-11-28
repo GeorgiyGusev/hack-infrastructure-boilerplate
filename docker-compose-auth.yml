@@ -7,7 +7,7 @@ services:
     image: postgres:latest
     container_name: "auth-database"
     volumes:
-      - user-data:/var/lib/postgresql/data
+      - user_data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: minin
       POSTGRES_USER: minin
