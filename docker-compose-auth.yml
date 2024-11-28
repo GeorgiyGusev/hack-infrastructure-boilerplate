@@ -1,61 +1,71 @@
-name: "kk"
-
+name: "minin-courses"
 
 services:
-  auth-database:
+
+
+  auth-db:
     image: postgres:latest
     container_name: "auth-database"
     volumes:
-      - userdata:/var/lib/postgresql/data
+      - user-data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: keycloak
+      POSTGRES_DB: minin
       POSTGRES_USER: minin
-      POSTGRES_PASSWORD: minin
+      POSTGRES_PASSWORD: minin1337
     restart: unless-stopped
     networks:
       - auth
 
-
-
   auth:
-    image: quay.io/keycloak/keycloak:latest
+    image: quay.io/keycloak/keycloak:25.0.1
     ports:
       - "8180:8080"
     environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin1337
       KC_PROXY: edge
       DB_DATABASE: minin
       DB_SCHEMA: public
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://auth-database:5432/keycloak
+      KC_DB_URL: jdbc:postgresql://auth-db:5432/minin
       KC_DB_USERNAME: minin
-      KC_DB_PASSWORD: minin
-      KEYCLOAK_ADMIN: minin
-      KEYCLOAK_ADMIN_PASSWORD: minin
-      KC_HOSTNAME: sso.kowlad.ru
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.sso.entrypoints=websecure"
-      - "traefik.http.routers.sso.rule=Host(`sso.kowlad.ru`)"
-      - "traefik.http.routers.sso.tls=true"
-      - "traefik.http.routers.sso.tls.certresolver=leresolver"
-#      - "traefik.http.routers.sso.service=sso"
-#      - "traefik.http.services.sso.loadbalancer.server.port=8080"
+      KC_DB_PASSWORD: minin1337
+
+      PROXY_ADDRESS_FORWARDING: true
     command:
       - start-dev
       - --import-realm
+      - "-Dkeycloak.migration.action=import"
+      - "-Dkeycloak.migration.provider=dir"
+      - "-Dkeycloak.migration.dir=/opt/keycloak/data/import"
+      - "-Dkeycloak.migration.strategy=OVERWRITE_EXISTING"
     volumes:
+      - ./realms:/opt/keycloak/data/import
       - ./keycloak/providers:/opt/keycloak/providers
     networks:
-      - auth
+      - app-network
       - traefik
+      - auth
+    labels:
+      # WebUi Config
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak.entrypoints=websecure"
+      - "traefik.http.routers.keycloak.rule=Host(`sso.kowlad.ru`)"
+      - "traefik.http.routers.keycloak.tls=true"
+      - "traefik.http.routers.keycloak.tls.certresolver=leresolver"
+      - "traefik.http.routers.keycloak.service=keycloak"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+    restart: always
+
 
 networks:
-  auth:
   traefik:
     name: "traefik-network"
     external: true
-
+  auth:
+  app-network:
+    driver: bridge
 
 volumes:
-  userdata:
+  user-data:
+  db-data:
