@@ -55,3 +55,7 @@ networks:
   traefik:
     name: "traefik-network"
     external: true
+
+
+volumes:
+  userdata:
