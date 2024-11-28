@@ -19,6 +19,8 @@ services:
 
   auth:
     image: quay.io/keycloak/keycloak:latest
+    ports:
+      - "8180:8080"
     environment:
       KC_PROXY: edge
       DB_DATABASE: minin
