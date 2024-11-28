@@ -1,0 +1,57 @@
+name: "kk"
+
+
+services:
+  auth-database:
+    image: postgres:latest
+    container_name: "auth-database"
+    volumes:
+      - userdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: minin
+      POSTGRES_PASSWORD: minin
+    restart: unless-stopped
+    networks:
+      - auth
+
+
+
+  auth:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      KC_PROXY: edge
+      DB_DATABASE: minin
+      DB_SCHEMA: public
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://auth-database:5432/keycloak
+      KC_DB_USERNAME: minin
+      KC_DB_PASSWORD: minin
+      KC_HTTP_ENABLED: 'true'
+      KC_HOSTNAME_STRICT: 'false'
+      KEYCLOAK_ADMIN: minin
+      KEYCLOAK_ADMIN_PASSWORD: minin
+      PROXY_ADDRESS_FORWARDING: true
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sso.entrypoints=websecure"
+      - "traefik.http.routers.sso.rule=Host(`sso.kowlad.ru`)"
+      - "traefik.http.routers.sso.tls=true"
+      - "traefik.http.routers.sso.tls.certresolver=leresolver"
+      - "traefik.http.routers.sso.service=sso"
+      - "traefik.http.services.sso.loadbalancer.server.port=8080"
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - ./keycloak/providers:/opt/keycloak/providers
+    networks:
+      - auth
+      - traefik
+
+networks:
+  auth:
+  traefik:
+    name: "traefik-network"
+    external: true
