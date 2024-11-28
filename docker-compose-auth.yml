@@ -33,7 +33,6 @@ services:
       KC_HOSTNAME_STRICT: 'false'
       KEYCLOAK_ADMIN: minin
       KEYCLOAK_ADMIN_PASSWORD: minin
-      PROXY_ADDRESS_FORWARDING: true
       KC_HOSTNAME: sso.kowlad.ru
     restart: unless-stopped
     labels:
