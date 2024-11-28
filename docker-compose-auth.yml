@@ -29,8 +29,6 @@ services:
       KC_DB_URL: jdbc:postgresql://auth-database:5432/keycloak
       KC_DB_USERNAME: minin
       KC_DB_PASSWORD: minin
-      KC_HTTP_ENABLED: 'true'
-      KC_HOSTNAME_STRICT: 'false'
       KEYCLOAK_ADMIN: minin
       KEYCLOAK_ADMIN_PASSWORD: minin
       KC_HOSTNAME: sso.kowlad.ru
