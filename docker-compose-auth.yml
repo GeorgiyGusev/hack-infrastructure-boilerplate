@@ -67,5 +67,4 @@ networks:
     driver: bridge
 
 volumes:
-  user-data:
-  db-data:
+  user_data:
