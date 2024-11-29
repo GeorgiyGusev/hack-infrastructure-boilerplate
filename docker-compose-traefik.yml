@@ -40,7 +40,6 @@ services:
 
 networks:
   traefik:
-    name: "traefik-network"
     driver: bridge
 
 volumes:

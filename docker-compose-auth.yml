@@ -60,7 +60,6 @@ services:
 
 networks:
   traefik:
-    name: "traefik-network"
     external: true
   auth:
   app-network:
