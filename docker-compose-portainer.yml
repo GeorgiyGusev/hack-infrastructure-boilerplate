@@ -14,7 +14,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"  # Доступ к Docker демону
     labels:
       - "traefik.enable=true"                                      # Включаем Traefik для Portainer
-      - "traefik.http.routers.portainer.rule=Host(`portainer.goida.dev`)"  # Домен для доступа к Portainer
+      - "traefik.http.routers.portainer.rule=Host(`portainer.kowlad.ru`)"  # Домен для доступа к Portainer
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"   # Порт Portainer внутри контейнера
       - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.routers.portainer.tls=true"
