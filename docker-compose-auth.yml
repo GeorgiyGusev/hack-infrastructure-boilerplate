@@ -43,7 +43,6 @@ services:
       - ./realms:/opt/keycloak/data/import
       - ./keycloak/providers:/opt/keycloak/providers
     networks:
-      - app-network
       - traefik
       - auth
     labels:
