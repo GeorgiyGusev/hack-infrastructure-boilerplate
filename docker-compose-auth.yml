@@ -62,8 +62,6 @@ networks:
   traefik:
     external: true
   auth:
-  app-network:
-    driver: bridge
 
 volumes:
   user_data:
