@@ -50,7 +50,7 @@ services:
       # WebUi Config
       - "traefik.enable=true"
       - "traefik.http.routers.keycloak.entrypoints=websecure"
-      - "traefik.http.routers.keycloak.rule=Host(`sso.kowlad.ru`)"
+      - "traefik.http.routers.keycloak.rule=Host(`sso.goida.dev`)"
       - "traefik.http.routers.keycloak.tls=true"
       - "traefik.http.routers.keycloak.tls.certresolver=leresolver"
       - "traefik.http.routers.keycloak.service=keycloak"
