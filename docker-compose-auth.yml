@@ -14,7 +14,7 @@ services:
       POSTGRES_PASSWORD: minin1337
     restart: unless-stopped
     networks:
-      - auth
+      - traefik
 
   auth:
     image: quay.io/keycloak/keycloak:25.0
@@ -44,7 +44,6 @@ services:
       - ./keycloak/providers:/opt/keycloak/providers
     networks:
       - traefik
-      - auth
     labels:
       # WebUi Config
       - "traefik.enable=true"
@@ -60,7 +59,6 @@ services:
 networks:
   traefik:
     external: true
-  auth:
 
 volumes:
   user_data:

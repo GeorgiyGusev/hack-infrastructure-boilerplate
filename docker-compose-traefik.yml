@@ -41,7 +41,6 @@ services:
 networks:
   traefik:
     name: "traefik"
-    driver: bridge
 
 volumes:
   letsencrypt:
