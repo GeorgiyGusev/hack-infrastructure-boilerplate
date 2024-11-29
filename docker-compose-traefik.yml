@@ -7,6 +7,7 @@ services:
       - "--log.level=DEBUG"
       - "--api.dashboard=true"
       - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false" # Disable auto-exposure of services
       - "--entryPoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
       - "--entryPoints.ssh.address=:2222"
